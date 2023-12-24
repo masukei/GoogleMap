@@ -56,6 +56,17 @@
         var target = document.getElementById('map');
         var centerp = {lat: 35.6679191, lng: 139.4606805};
 
+        // 地図のスタイルを設定
+        var mapStyles = [
+        {
+        featureType: 'landscape',
+        elementType: 'geometry',
+        stylers: [
+         { color: '#f5f5f5' } // 地形の色を指定
+            ]
+          }
+        ];
+
         map = new google.maps.Map(target, {
           center: centerp,
           zoom: 7,
