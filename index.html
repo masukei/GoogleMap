@@ -1,248 +1,314 @@
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="utf-8">
-<title>sheet2gmap</title>
-<style>  /* ... */
-#map {
-height: 100%;
-}
-html, body {
-height: 100%;
-margin: 0;
-padding: 0;
-}
-#sidebar {
-position: absolute;
-top: 10%;
-left: 1%;
-width: 15%;
-height: 90%;
-border: 1px solid #666;
-padding: 6px;
-font-family: Meriyo UI;
-font-size: 10px;
-}
+    <meta charset="utf-8">
+    <title>sheet2gmap</title>
+    <style>
+        #map {
+            height: 100%;
+        }
 
-ul {list-style: none; padding-left: 0em; background-color :transparent}
-.file {
-cursor: pointer;
-}
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
 
-.folder {
-display: inline-block;
-margin-right: 3px;
-background-color: lime;
-font-size: 12px;
-}
+        #sidebar {
+            position: absolute;
+            top: 10%;
+            left: 1%;
+            width: 15%;
+            height: 90%;
+            border: 1px solid #666;
+            padding: 6px;
+            font-family: 'Meriyo UI', sans-serif;
+            font-size: 10px;
+        }
 
-.folder.open {
-}
-.file .open {background-color : green;}
-</style>
+        ul {
+            list-style: none;
+            padding-left: 0em;
+            background-color: transparent;
+        }
+
+        .file {
+            cursor: pointer;
+        }
+
+        .folder {
+            display: inline-block;
+            margin-right: 3px;
+            background-color: lime;
+            font-size: 12px;
+        }
+
+        .folder.open {}
+
+        .file .open {
+            background-color: green;
+        }
+    </style>
 </head>
+
 <body>
-<div id="map"></div>
-<div id="sidebar">
-<ul> <li> <span class="folder" >【撮影担当者】</span>
-<ul>
-<li id="graphers"></li>
-</ul>
-</li>
-<li> <span class="folder" >【アポ取得済】</span>
-<ul><li id="shops"></li></ul>
-</li>
-</ul>
-</div>
+    <div id="map"></div>
+    <div id="sidebar">
+        <ul>
+            <li>
+                <span class="folder">【撮影担当者】</span>
+                <ul>
+                    <li id="graphers"></li>
+                </ul>
+            </li>
+            <li>
+                <span class="folder">【アポ取得済】</span>
+                <ul>
+                    <li id="shops"></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
 
-<script src="https://maps.googleapis.com/maps/api/js?language=ja&region=JP&key=AIzaSyCb6szaPAMuxRNP2SEeT5haDFsjHzCAakk&callback=initMap" async defer></script>
-<script>
-const pinColors= {A:'pink',B:'blue',C:'yellow',D:'green',E:'purple'};//redは標準
-var map;
-var marker  = [];var infoWindow  = [];var windowOpened;
-var marker2 = [];var infoWindow2 = [];var windowOpened2;
-var SHEET_ID ="dummySheetId";
-document.addEventListener('DOMContentLoaded', function() {//サイドバーのリスト表示の切替処理
-const files = document.querySelectorAll('.file');
-for (let i = 0; i < files.length; i++) {
-files[i].addEventListener('click', function() {;//folderに設置
-this.classList.toggle('open');
-} //end for
-)
-};
-//
-const folders = document.querySelectorAll('.folder');
-for (let i = 0; i < folders.length; i++) {
-folders[i].addEventListener('click', function() { //folderに設置
-this.classList.toggle('open');
-let ul = this.nextElementSibling;//この要素の親の子リスト内ですぐ次にある要素を返します
-if (ul) {
-ul.style.display = ul.style.display === 'none' ? 'block' : 'none';
-}
-});
-let ul = folders[i].nextElementSibling;
-if (ul) {ul.style.display = 'block';
-}
-} //end for
-});//main end
+    <script src="https://maps.googleapis.com/maps/api/js?language=ja&region=JP&key=YOUR_GOOGLE_MAPS_API_KEY&callback=initMap"
+        async defer></script>
+    <script>
+        const pinColors = {
+            A: 'pink',
+            B: 'blue',
+            C: 'yellow',
+            D: 'green',
+            E: 'purple'
+        };
+        var map;
+        var marker = [];
+        var infoWindow = [];
+        var windowOpened;
+        var marker2 = [];
+        var infoWindow2 = [];
+        var windowOpened2;
+        var SHEET_ID = "dummySheetId";
 
-function initMap() {
-var target = document.getElementById('map');
-var centerp = {lat: 35.6679191, lng: 139.4606805};
-map = new google.maps.Map(target, {center: centerp,zoom: 7,});
-getSheetValues('撮影担当者');
-getSheetValues2('アポ取得済');
-}//end iniMap
+        document.addEventListener('DOMContentLoaded', function () {
+            const files = document.querySelectorAll('.file');
+            for (let i = 0; i < files.length; i++) {
+                files[i].addEventListener('click', function () {
+                    this.classList.toggle('open');
+                });
+            }
 
-function openWindow(i) {
-if(windowOpened){
-windowOpened.close();
-}
-infoWindow[i].open(map, marker[i]);
-windowOpened = infoWindow[i];
-}
-function openWindow2(i) {//i:行番
-if(windowOpened2){
-windowOpened2.close();
-}
-infoWindow2[i].open(map, marker2[i]);
-windowOpened2 = infoWindow2[i];
-}
+            const folders = document.querySelectorAll('.folder');
+            for (let i = 0; i < folders.length; i++) {
+                folders[i].addEventListener('click', function () {
+                    this.classList.toggle('open');
+                    let ul = this.nextElementSibling;
+                    if (ul) {
+                        ul.style.display = ul.style.display === 'none' ? 'block' : 'none';
+                    }
+                });
+                let ul = folders[i].nextElementSibling;
+                if (ul) {
+                    ul.style.display = 'block';
+                }
+            }
+        });
 
-function setData(markerData){//撮影担当者
-var sidebar_html = '';
-for (var i = 0; i < markerData.length; i++) {
-var latitude = markerData[i]['緯度'];
-if (!latitude) { continue; }
-addMarker(i, markerData[i]);
-var name = markerData[i]['名前'];//grapersのサイド表示
-sidebar_html += `<li class="file"> <a href="javascript:openWindow(${i})">${i+1}.${name}</a></li>`;
-}
-document.getElementById('graphers').innerHTML = sidebar_html;
-}
+        function initMap() {
+            var target = document.getElementById('map');
+            var centerp = {
+                lat: 35.6679191,
+                lng: 139.4606805
+            };
+            map = new google.maps.Map(target, {
+                center: centerp,
+                zoom: 7,
+            });
+            getSheetValues('撮影担当者');
+            getSheetValues2('アポ取得済');
+        }
 
-function setData2(markerData2){//shop
-var sidebar_html = '';
-for (var i = 0; i < markerData2.length; i++) {//console.log('setData2 名称='+markerData2[i]['名称']);
-var latitude = markerData2[i]['緯度'];
-if (!latitude) { continue; }
-addMarker2(i, markerData2[i]);
-var name = markerData2[i]['名称'];//console.log(name);
-sidebar_html += `<li> <a href="javascript:openWindow2(${i})">${i+1}.${name}</a></li>`;
-}
-document.getElementById('shops').innerHTML = sidebar_html;
-}
+        function openWindow(i) {
+            if (windowOpened) {
+                windowOpened.close();
+            }
+            infoWindow[i].open(map, marker[i]);
+            windowOpened = infoWindow[i];
+        }
 
-function addMarker(i, data) {//撮影担当者
-var markerLatLng = new google.maps.LatLng({
-lat: Number(data['緯度']),
-lng: Number(data['経度'])
-});
-var iconBase = 'https://maps.google.com/mapfiles/kml/shapes/';
-marker[i] = new google.maps.Marker({
-position: markerLatLng,
-map: map,
-icon: iconBase + 'parking_lot_maps.png'
-});
-var info = `<div style="font-size:18px;font-weight:bold;margin-bottom:10px;"> ${data['名前']}</div><div>${data['住所']}</div><div>${data['担当者ID']}</div>`;
-infoWindow[i] = new google.maps.InfoWindow({
-content: info
-});
-marker[i].addListener('click', function() {openWindow(i);});
-//markerEvent(i);
-}
-function addMarker2(i, data) {//shop
-var markerLatLng = new google.maps.LatLng({
-lat: Number(data['緯度']),
-lng: Number(data['経度'])
-});
-var pinurl1 = pinColors[data['案件ID']]? pinColors[data['案件ID']]:'red';
-var icon2 = {path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW, scale: 6, rotation:0, fillColor: pinurl1, fillOpacity: 0.7, strokeColor: pinurl1, strokeWeight:2};
-const kakudos ={"作成中":90,"検収中":135,"完了":180};
-icon2.rotation = (kakudos[data["ステータス"]])? kakudos[data["ステータス"]]: 0;
-marker2[i] = new google.maps.Marker({
-position: markerLatLng,
-//icon: {url: "https://maps.google.com/mapfiles/ms/icons/"+pinurl1+"-dot.png"},
-icon: icon2,
-label:`${i+1}`,
-map: map
-});
-var info = `<div style="font-size:18px;font-weight:bold;margin-bottom:10px;"> ${data['名称']}</div><div>${data['ID']}</div>`;
-info += `<div>${data["住所"]}</div> <div>${data["電話番号"]}</div> <div><a href="${data["食べログ"]}">食べログ</a></div> <div>${data["案件ID"]}</div>`;
-info += `<div>${data["ステータス"]}</div><div>${data["担当者ID"]}</div><div>${data["撮影予定日"]}</div><div>${data["ジャンル"]}</div>`;
-infoWindow2[i] = new google.maps.InfoWindow({
-content: info
-});
-marker2[i].addListener('click', function() {openWindow2(i);});
-//markerEvent(i);
-}//end addMarker2
-function getSheetValues3(){
-var data = {};
-var shopRows = [["名称","住所","経度","緯度",'区分']];
-shopRows.push(["まことや","愛知県名古屋市昭和区檀渓通4-14","136.945251","35.141815",1]);
-shopRows.push(["まことや2","静岡県静岡市昭和区4-14","137.945251","35.141815",1]);
-//shopRows.push(['東京屋','東京駅','139.753632','35.694004',1]);
-data["values"]= shopRows;
-return data;}
+        function openWindow2(i) {
+            if (windowOpened2) {
+                windowOpened2.close();
+            }
+            infoWindow2[i].open(map, marker2[i]);
+            windowOpened2 = infoWindow2[i];
+        }
 
-function getSheetValues(isheetName){
-console.log('please wait a second');
-var irows;
-const xhr = new XMLHttpRequest();
-const ssid = '103hQleoRSkfpYH7_OgWZlwu-Gn1CGr7uVinylpdOCOQ';
-const sheetV4Apikey = 'AIzaSyCb6szaPAMuxRNP2SEeT5haDFsjHzCAakk';
-var   sheetName  = isheetName? isheetName:'sheet1';
-const url = 'https://sheets.googleapis.com/v4/spreadsheets/'+ssid+'/values/'+sheetName+'?key='+sheetV4Apikey;
-xhr.open('GET',url,true); xhr.send(); xhr.responseType = "json";
-xhr.onload = () => {
-if (xhr.readyState == 4 && xhr.status == 200) {
-const data = xhr.response;
-console.log(sheetName+' getRows='+data['values'].length);
-irows = data['values'];
-} else { console.log(`Error: ${xhr.status}`);  }
-var keys = irows[0];
-var markerData = [];
-irows.forEach(function(value, i) {
-if (i > 0) {
-var hash = {};
-value.forEach(function(d, j) {
-hash[keys[j]] = d;
-});
-markerData.push(hash);
-}
-});//end forEach
-setData(markerData);}//end load
-};//end getSheetValues
+        function setData(markerData) {
+            var sidebar_html = '';
+            for (var i = 0; i < markerData.length; i++) {
+                var latitude = markerData[i]['緯度'];
+                if (!latitude) {
+                    continue;
+                }
+                addMarker(i, markerData[i]);
+                var name = markerData[i]['名前'];
+                sidebar_html += `<li class="file"> <a href="javascript:openWindow(${i})">${i+1}.${name}</a></li>`;
+            }
+            document.getElementById('graphers').innerHTML = sidebar_html;
+        }
 
-function getSheetValues2(isheetName){
-console.log('please wait a second');
-var irows;
-const xhr = new XMLHttpRequest();
-const ssid = '103hQleoRSkfpYH7_OgWZlwu-Gn1CGr7uVinylpdOCOQ';
-const sheetV4Apikey = 'AIzaSyCb6szaPAMuxRNP2SEeT5haDFsjHzCAakk';
-var   sheetName  = isheetName? isheetName:'sheet1';
-const url = 'https://sheets.googleapis.com/v4/spreadsheets/'+ssid+'/values/'+sheetName+'?key='+sheetV4Apikey;
-xhr.open('GET',url,true); xhr.send(); xhr.responseType = "json";
-xhr.onload = () => {
-if (xhr.readyState == 4 && xhr.status == 200) {
-const data = xhr.response;
-console.log(sheetName+' getRows='+data['values'].length);
-irows = data['values'];
-} else { console.log(`Error: ${xhr.status}`);  }
-//};
-var keys = irows[0];
-var markerData2 = [];
-irows.forEach(function(value, i) {
-if (i > 0) {
-var hash = {};
-value.forEach(function(d, j) {
-hash[keys[j]] = d;
-});
-markerData2.push(hash);}
-});//end forEach
-setData2(markerData2);}//end load
-};//end getSheetValues
-</script>
+        function setData2(markerData2) {
+            var sidebar_html = '';
+            for (var i = 0; i < markerData2.length; i++) {
+                var latitude = markerData2[i]['緯度'];
+                if (!latitude) {
+                    continue;
+                }
+                addMarker2(i, markerData2[i]);
+                var name = markerData2[i]['名称'];
+                sidebar_html += `<li> <a href="javascript:openWindow2(${i})">${i+1}.${name}</a></li>`;
+            }
+            document.getElementById('shops').innerHTML = sidebar_html;
+        }
 
+        function addMarker(i, data) {
+            var markerLatLng = new google.maps.LatLng({
+                lat: Number(data['緯度']),
+                lng: Number(data['経度'])
+            });
+            var iconBase = 'https://maps.google.com/mapfiles/kml/shapes/';
+            marker[i] = new google.maps.Marker({
+                position: markerLatLng,
+                map: map,
+                icon: iconBase + 'parking_lot_maps.png'
+            });
+            var info = `<div style="font-size:18px;font-weight:bold;margin-bottom:10px;"> ${data['名前']}</div><div>${data['住所']}</div><div>${data['担当者ID']}</div>`;
+            infoWindow[i] = new google.maps.InfoWindow({
+                content: info
+            });
+            marker[i].addListener('click', function () {
+                openWindow(i);
+            });
+        }
+
+        function addMarker2(i, data) {
+            var markerLatLng = new google.maps.LatLng({
+                lat: Number(data['緯度']),
+                lng: Number(data['経度'])
+            });
+            var pinurl1 = pinColors[data['案件ID']] ? pinColors[data['案件ID']] : 'red';
+            var icon2 = {
+                path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+                scale: 6,
+                rotation: 0,
+                fillColor: pinurl1,
+                fillOpacity: 0.7,
+                strokeColor: pinurl1,
+                strokeWeight: 2
+            };
+            const kakudos = { "作成中": 90, "検収中": 135, "完了": 180 };
+            icon2.rotation = (kakudos[data["ステータス"]]) ? kakudos[data["ステータス"]] : 0;
+            marker2[i] = new google.maps.Marker({
+                position: markerLatLng,
+                icon: icon2,
+                label: `${i+1}`,
+                map: map
+            });
+            var info = `<div style="font-size:18px;font-weight:bold;margin-bottom:10px;"> ${data['名称']}</div><div>${data['ID']}</div>`;
+            info += `<div>${data["住所"]}</div> <div>${data["電話番号"]}</div> <div><a href="${data["食べログ"]}">食べログ</a></div> <div>${data["案件ID"]}</div>`;
+            info += `<div>${data["ステータス"]}</div><div>${data["担当者ID"]}</div><div>${data["撮影予定日"]}</div><div>${data["ジャンル"]}</div>`;
+            infoWindow2[i] = new google.maps.InfoWindow({
+                content: info
+            });
+            marker2[i].addListener('click', function () {
+                openWindow2(i);
+            });
+        }
+
+        function getSheetValues3() {
+            var data = {};
+            var shopRows = [
+                ["名称", "住所", "経度", "緯度", '区分'],
+                ["まことや", "愛知県名古屋市昭和区檀渓通4-14", "136.945251", "35.141815", 1],
+                ["まことや2", "静岡県静岡市昭和区4-14", "137.945251", "35.141815", 1],
+                // ["東京屋", "東京駅", "139.753632", "35.694004", 1]
+            ];
+            data["values"] = shopRows;
+            return data;
+        }
+
+        function getSheetValues(isheetName) {
+            console.log('please wait a second');
+            var irows;
+            const xhr = new XMLHttpRequest();
+            const ssid = '103hQleoRSkfpYH7_OgWZlwu-Gn1CGr7uVinylpdOCOQ';
+            const sheetV4Apikey = 'YOUR_GOOGLE_SHEET_API_KEY';
+            var sheetName = isheetName ? isheetName : 'sheet1';
+            const url = 'https://sheets.googleapis.com/v4/spreadsheets/' + ssid + '/values/' + sheetName +
+                '?key=' + sheetV4Apikey;
+            xhr.open('GET', url, true);
+            xhr.send();
+            xhr.responseType = "json";
+            xhr.onload = () => {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    const data = xhr.response;
+                    console.log(sheetName + ' getRows=' + data['values'].length);
+                    irows = data['values'];
+                } else {
+                    console.log(`Error: ${xhr.status}`);
+                }
+                var keys = irows[0];
+                var markerData = [];
+                irows.forEach(function (value, i) {
+                    if (i > 0) {
+                        var hash = {};
+                        value.forEach(function (d, j) {
+                            hash[keys[j]] = d;
+                        });
+                        markerData.push(hash);
+                    }
+                });
+                setData(markerData);
+            };
+        }
+
+        function getSheetValues2(isheetName) {
+            console.log('please wait a second');
+            var irows;
+            const xhr = new XMLHttpRequest();
+            const ssid = '103hQleoRSkfpYH7_OgWZlwu-Gn1CGr7uVinylpdOCOQ';
+            const sheetV4Apikey = 'YOUR_GOOGLE_SHEET_API_KEY';
+            var sheetName = isheetName ? isheetName : 'sheet1';
+            const url = 'https://sheets.googleapis.com/v4/spreadsheets/' + ssid + '/values/' + sheetName +
+                '?key=' + sheetV4Apikey;
+            xhr.open('GET', url, true);
+            xhr.send();
+            xhr.responseType = "json";
+            xhr.onload = () => {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    const data = xhr.response;
+                    console.log(sheetName + ' getRows=' + data['values'].length);
+                    irows = data['values'];
+                } else {
+                    console.log(`Error: ${xhr.status}`);
+                }
+                var keys = irows[0];
+                var markerData2 = [];
+                irows.forEach(function (value, i) {
+                    if (i > 0) {
+                        var hash = {};
+                        value.forEach(function (d, j) {
+                            hash[keys[j]] = d;
+                        });
+                        markerData2.push(hash);
+                    }
+                });
+                setData2(markerData2);
+            };
+        }
+    </script>
 </body>
 
 </html>
